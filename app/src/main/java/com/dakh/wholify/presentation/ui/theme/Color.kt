@@ -1,4 +1,4 @@
-package com.dakh.wholify.ui.theme
+package com.dakh.wholify.presentation.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
