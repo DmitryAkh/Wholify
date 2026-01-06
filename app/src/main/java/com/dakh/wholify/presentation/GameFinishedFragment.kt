@@ -4,13 +4,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
+import com.dakh.wholify.R
 import com.dakh.wholify.databinding.FragmentGameFinishedBinding
 import com.dakh.wholify.domain.entity.GameResult
+import kotlin.getValue
 
 class GameFinishedFragment : Fragment() {
+
+    private val args by navArgs<GameFinishedFragmentArgs>()
 
     private lateinit var result: GameResult
 
@@ -19,7 +23,7 @@ class GameFinishedFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        parseArgs()
+        result = args.gameResult
     }
 
     override fun onCreateView(
@@ -36,19 +40,8 @@ class GameFinishedFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val callback = object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                retryGame()
-            }
-        }
-        requireActivity().onBackPressedDispatcher.addCallback(
-            viewLifecycleOwner, // удаляет view и callBack. Activity не будет хранить ссылку на объект
-            callback
-        )
-
-        binding.buttonRetry.setOnClickListener {
-            retryGame()
-        }
+        bindViews()
+        setupClickListeners()
     }
 
     override fun onDestroyView() {
@@ -56,28 +49,49 @@ class GameFinishedFragment : Fragment() {
         _binding = null
     }
 
-    private fun parseArgs() {
-        result = requireArguments().getParcelable(KEY_GAME_RESULT, GameResult::class.java)
-            ?: throw IllegalArgumentException("Result argument is missing")
+    private fun setupClickListeners() {
+
+        binding.buttonRetry.setOnClickListener {
+            retryGame()
+        }
+    }
+
+    private fun bindViews() {
+        with(binding) {
+
+            emojiResult.setImageResource(getSmileResId())
+
+            tvRequiredAnswers.text = String.format(
+                requireContext().resources.getString(R.string.required_score),
+                result.gameSettings.minCountOfRightAnswers
+            )
+            tvScoreAnswers.text = String.format(
+                requireContext().resources.getString(R.string.score_answers),
+                result.countOfRightAnswers
+            )
+
+
+            tvRequiredPercentage.text = String.format(
+                requireContext().resources.getString(R.string.required_percentage),
+                result.gameSettings.minPercentOfRightAnswers
+            )
+
+            tvScorePercentage.text = String.format(
+                requireContext().resources.getString(R.string.score_percentage),
+                ((result.countOfRightAnswers / result.countOfQuestions.toDouble()) * 100)
+            )
+        }
+    }
+
+    private fun getSmileResId(): Int {
+        return if (result.winner) {
+            R.drawable.ic_smile
+        } else {
+            R.drawable.ic_sad
+        }
     }
 
     private fun retryGame() {
-        requireActivity().supportFragmentManager.popBackStack(
-            GameFragment.NAME,
-            FragmentManager.POP_BACK_STACK_INCLUSIVE //удаляет фрагменты до указанного включительно
-        )
-    }
-
-    companion object {
-
-        private const val KEY_GAME_RESULT = "Game result"
-
-        fun getInstance(result: GameResult): GameFinishedFragment {
-            return GameFinishedFragment().apply {
-                arguments = Bundle().apply {
-                    putParcelable(KEY_GAME_RESULT, result)
-                }
-            }
-        }
+       findNavController().popBackStack()
     }
 }
