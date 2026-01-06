@@ -57,28 +57,29 @@ class GameFinishedFragment : Fragment() {
     }
 
     private fun bindViews() {
+        binding.gameResult = result
         with(binding) {
 
             emojiResult.setImageResource(getSmileResId())
 
-            tvRequiredAnswers.text = String.format(
-                requireContext().resources.getString(R.string.required_score),
-                result.gameSettings.minCountOfRightAnswers
-            )
-            tvScoreAnswers.text = String.format(
-                requireContext().resources.getString(R.string.score_answers),
-                result.countOfRightAnswers
-            )
-
-
-            tvRequiredPercentage.text = String.format(
-                requireContext().resources.getString(R.string.required_percentage),
-                result.gameSettings.minPercentOfRightAnswers
-            )
+//            tvRequiredAnswers.text = String.format(
+//                requireContext().resources.getString(R.string.required_score),
+//                result.gameSettings.minCountOfRightAnswers
+//            )
+//            tvScoreAnswers.text = String.format(
+//                requireContext().resources.getString(R.string.score_answers),
+//                result.countOfRightAnswers
+//            )
+//
+//
+//            tvRequiredPercentage.text = String.format(
+//                requireContext().resources.getString(R.string.required_percentage),
+//                result.gameSettings.minPercentOfRightAnswers
+//            )
 
             tvScorePercentage.text = String.format(
                 requireContext().resources.getString(R.string.score_percentage),
-                ((result.countOfRightAnswers / result.countOfQuestions.toDouble()) * 100)
+                getPercentOfRightAnswers()
             )
         }
     }
@@ -93,5 +94,9 @@ class GameFinishedFragment : Fragment() {
 
     private fun retryGame() {
        findNavController().popBackStack()
+    }
+
+    private fun getPercentOfRightAnswers(): String {
+        return ((result.countOfRightAnswers / result.countOfQuestions.toDouble()) * 100).toString()
     }
 }
