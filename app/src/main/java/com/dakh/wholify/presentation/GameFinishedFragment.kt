@@ -7,10 +7,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.dakh.wholify.R
 import com.dakh.wholify.databinding.FragmentGameFinishedBinding
 import com.dakh.wholify.domain.entity.GameResult
-import kotlin.getValue
 
 class GameFinishedFragment : Fragment() {
 
@@ -40,7 +38,7 @@ class GameFinishedFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        bindViews()
+        binding.gameResult = result
         setupClickListeners()
     }
 
@@ -56,47 +54,7 @@ class GameFinishedFragment : Fragment() {
         }
     }
 
-    private fun bindViews() {
-        binding.gameResult = result
-        with(binding) {
-
-            emojiResult.setImageResource(getSmileResId())
-
-//            tvRequiredAnswers.text = String.format(
-//                requireContext().resources.getString(R.string.required_score),
-//                result.gameSettings.minCountOfRightAnswers
-//            )
-//            tvScoreAnswers.text = String.format(
-//                requireContext().resources.getString(R.string.score_answers),
-//                result.countOfRightAnswers
-//            )
-//
-//
-//            tvRequiredPercentage.text = String.format(
-//                requireContext().resources.getString(R.string.required_percentage),
-//                result.gameSettings.minPercentOfRightAnswers
-//            )
-
-            tvScorePercentage.text = String.format(
-                requireContext().resources.getString(R.string.score_percentage),
-                getPercentOfRightAnswers()
-            )
-        }
-    }
-
-    private fun getSmileResId(): Int {
-        return if (result.winner) {
-            R.drawable.ic_smile
-        } else {
-            R.drawable.ic_sad
-        }
-    }
-
     private fun retryGame() {
        findNavController().popBackStack()
-    }
-
-    private fun getPercentOfRightAnswers(): String {
-        return ((result.countOfRightAnswers / result.countOfQuestions.toDouble()) * 100).toString()
     }
 }
