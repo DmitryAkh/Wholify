@@ -13,11 +13,12 @@ import com.dakh.wholify.domain.entity.Level
 import com.dakh.wholify.domain.entity.Question
 import com.dakh.wholify.domain.useCase.GenerateQuestionUseCase
 import com.dakh.wholify.domain.useCase.GetGameSettingsUseCase
+import java.util.Locale
 
 class GameViewModel(
     private val application: Application, // если передать context - будет утечка
-    private val level: Level
-    ) : ViewModel() {
+    private val level: Level,
+) : ViewModel() {
 
     private lateinit var gameSettings: GameSettings
 
@@ -85,8 +86,8 @@ class GameViewModel(
         _percentOfRightAnswers.value = percent
         _progressAnswers.value = String.format(
             application.resources.getString(R.string.progress_answers),
-            countOfRightAnswers,
-            gameSettings.minCountOfRightAnswers
+            countOfRightAnswers.toString(),
+            gameSettings.minCountOfRightAnswers.toString()
         )
         _enoughCount.value =
             countOfRightAnswers >= gameSettings.minCountOfRightAnswers
@@ -137,7 +138,10 @@ class GameViewModel(
         val seconds = milliseconds / MILLIS_IN_SECOND
         val minutes = seconds / SECONDS_IN_MINUTE
         val leftSeconds = seconds - (minutes * SECONDS_IN_MINUTE)
-        return String.format("%02d:%02d", minutes, leftSeconds)
+        return String.format(
+            Locale.getDefault(Locale.Category.FORMAT),
+            "%02d:%02d", minutes, leftSeconds
+        )
     }
 
     private fun finishGame() {
